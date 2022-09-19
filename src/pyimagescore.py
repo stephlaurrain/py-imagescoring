@@ -37,7 +37,6 @@ class Pyimagescore:
         @_error_decorator()
         def init(self):            
                 self.trace(inspect.stack()[0])                
-                pass
 
         @_trace_decorator        
         @_error_decorator()
@@ -102,7 +101,7 @@ class Pyimagescore:
                         print(f'Popularity score: {score}')
                         self.class_and_write(reportArray=reportArray)
         
-        def init_main(self, command, jsonfile):
+        def init_main(self, jsonfile):
                 try:
                         self.root_app = os.getcwd()
                         self.log = mylog.Log()
@@ -134,7 +133,7 @@ class Pyimagescore:
                         #logs
                         # for tests command = "test"
                         self.trace(inspect.stack()[0])     
-                        self.driver = self.init_main(command, jsonfile)                        
+                        self.driver = self.init_main(jsonfile)                        
                         print(command)                                                       
                         if (command=="test"):   
                                 self.test()

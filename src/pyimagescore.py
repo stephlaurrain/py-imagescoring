@@ -132,8 +132,9 @@ class Pyimagescore:
                         
                         #logs
                         # for tests command = "test"
-                        self.trace(inspect.stack()[0])     
                         self.init_main(jsonfile) 
+                        self.trace(inspect.stack()[0])     
+                       
                         print(command)                                                       
                         if (command=="test"):   
                                 self.test()

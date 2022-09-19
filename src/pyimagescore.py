@@ -99,7 +99,7 @@ class Pyimagescore:
                         report = ResultCls(name=os.path.basename(img), score = score)
                         reportArray.append(report)                        
                         print(f'Popularity score: {score}')
-                        self.class_and_write(reportArray=reportArray)
+                self.class_and_write(reportArray=reportArray)
         
         def init_main(self, jsonfile):
                 try:

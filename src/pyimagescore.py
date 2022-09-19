@@ -24,13 +24,10 @@ class ResultCls():
         def __init__(self, name, score): 
                 self.name = name
                 self.score = score   
-
-
 class Pyimagescore:
       
         def __init__(self):                                
                self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-               
 
         def trace(self, stck):                
                 self.log.lg(f"{stck.function} ({ stck.filename}-{stck.lineno})")
@@ -49,7 +46,6 @@ class Pyimagescore:
                 text_file.write(f"{pth}\n")
                 text_file.write(f"image ={pth}\n")
                 text_file.write(f"score ={score}\n")
-                
 
         @_trace_decorator
         @_error_decorator()
@@ -70,7 +66,6 @@ class Pyimagescore:
                 image = self.prepare_image(image)
                 with torch.no_grad():
                         preds = model(image)
-                
                 return r'%.2f' % preds.item()
         
         @_trace_decorator
@@ -84,7 +79,6 @@ class Pyimagescore:
                         self.write_to_result_file(text_file, report.name, report.score)                
                 text_file.close() 
 
-
         @_trace_decorator
         @_error_decorator()
         def test(self):         
@@ -92,8 +86,6 @@ class Pyimagescore:
                 print(theimages)                
                 resnetfile = f"{self.root_app}{os.path.sep}data{os.path.sep}models{os.path.sep}{self.jsprms.prms['resnet_file']}"
                 reportArray = []
-                
-                
                 for img in theimages:
                         image = Image.open(img)
                         model = torchvision.models.resnet50()
@@ -140,20 +132,17 @@ class Pyimagescore:
                         print(f"command={command}") 
                         self.init_main(command, jsonfile) 
                         #logs
-                       
                         # for tests command = "test"
                         self.trace(inspect.stack()[0])     
                         self.driver = self.init_main(command, jsonfile)                        
                         print(command)                                                       
                         if (command=="test"):   
                                 self.test()
-
                         self.log.lg("=THE END COMPLETE=")
                 except KeyboardInterrupt:
                         print("==>> Interrupted <<==")
                         pass
                 except Exception as e:
-
                         print("==>> GLOBAL MAIN EXCEPTION <<==")
                         self.log.errlg(e)                       
                         return False

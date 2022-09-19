@@ -20,7 +20,10 @@ import torchvision.transforms as transforms
 from PIL import Image
 import glob
 
-
+class ResultCls():
+        def __init__(self, name, score): 
+                self.name = name
+                self.score = score   
 
 
 class Pyimagescore:
@@ -77,8 +80,9 @@ class Pyimagescore:
                 theimages = list(glob.glob(os.path.join("data/images",'*.*')))
                 print(theimages)                
                 resnetfile = f"{self.root_app}{os.path.sep}data{os.path.sep}models{os.path.sep}{self.jsprms.prms['resnet_file']}"
-                result_file_path =  f"{self.root_app}{os.path.sep}data{os.path.sep}results.txt"
-                text_file = open(result_file_path, "w")     
+                reportArray = []
+                
+                
                 for img in theimages:
                         image = Image.open(img)
                         model = torchvision.models.resnet50()
@@ -91,8 +95,17 @@ class Pyimagescore:
                         model.eval().to(self.device)
                         print(img)
                         score = self.predict(image, model)
+                        report = ResultCls(name=os.path.basename(img), score = score)
+                        reportArray.append(report)                        
                         print(f'Popularity score: {score}')
-                        self.write_to_result_file(text_file, img, score)
+                
+                reportArray.sort(key=lambda x: x.score, reverse=True)
+                
+
+                result_file_path =  f"{self.root_app}{os.path.sep}data{os.path.sep}results.txt"
+                text_file = open(result_file_path, "w")     
+                for report in reportArray:
+                        self.write_to_result_file(text_file, report.name, report.score)                
                 text_file.close() 
         
         def init_main(self, command, jsonfile):

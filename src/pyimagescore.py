@@ -72,7 +72,18 @@ class Pyimagescore:
                         preds = model(image)
                 
                 return r'%.2f' % preds.item()
-                
+        
+        @_trace_decorator
+        @_error_decorator()
+        def class_and_write(self, reportArray):    
+                # classement et ecriture résultats                
+                reportArray.sort(key=lambda x: x.score, reverse=True)
+                result_file_path =  f"{self.root_app}{os.path.sep}data{os.path.sep}results.txt"
+                text_file = open(result_file_path, "w")     
+                for report in reportArray:
+                        self.write_to_result_file(text_file, report.name, report.score)                
+                text_file.close() 
+
 
         @_trace_decorator
         @_error_decorator()
@@ -86,10 +97,9 @@ class Pyimagescore:
                 for img in theimages:
                         image = Image.open(img)
                         model = torchvision.models.resnet50()
-                       # num_ftrs = model.fc.in_features
-                       # model.fc = torch.nn.Linear(num_ftrs, 1000)
-                        # model.avgpool = nn.AdaptiveAvgPool2d(1) # for any size of the input
-                        
+                        # num_ftrs = model.fc.in_features
+                        # model.fc = torch.nn.Linear(num_ftrs, 1000)
+                        # model.avgpool = nn.AdaptiveAvgPool2d(1) # for any size of the input                        
                         model.fc = torch.nn.Linear(in_features=2048, out_features=1)
                         model.load_state_dict(torch.load(resnetfile, map_location=self.device)) 
                         model.eval().to(self.device)
@@ -98,15 +108,7 @@ class Pyimagescore:
                         report = ResultCls(name=os.path.basename(img), score = score)
                         reportArray.append(report)                        
                         print(f'Popularity score: {score}')
-                
-                reportArray.sort(key=lambda x: x.score, reverse=True)
-                
-
-                result_file_path =  f"{self.root_app}{os.path.sep}data{os.path.sep}results.txt"
-                text_file = open(result_file_path, "w")     
-                for report in reportArray:
-                        self.write_to_result_file(text_file, report.name, report.score)                
-                text_file.close() 
+                        self.class_and_write(reportArray=reportArray)
         
         def init_main(self, command, jsonfile):
                 try:

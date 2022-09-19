@@ -1,0 +1,9 @@
+{
+  "test":false,  
+  "chromedriver":"/usr/bin/chromedriver",
+  "keep_log_time":1,
+  "keep_log_unit":"m"
+}
+  
+
+

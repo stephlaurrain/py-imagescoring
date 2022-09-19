@@ -21,10 +21,12 @@ from PIL import Image
 import glob
 
 
+
+
 class Pyimagescore:
       
         def __init__(self):                                
-               pass 
+               self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
                
 
         def trace(self, stck):                
@@ -48,36 +50,33 @@ class Pyimagescore:
                         ])
                 image = Transform(image)   
                 image = image.unsqueeze(0)
-                return image
+                return image.to(self.device)
 
         @_trace_decorator
         @_error_decorator()
-        def predict(self, image, model, image_path):
+        def predict(self, image, model):
                 image = self.prepare_image(image)
                 with torch.no_grad():
                         preds = model(image)
-                        np_array = preds.detach().numpy()
-               
-                lst = np_array.tolist()
-                print(lst)
-                
+                print(r'Popularity score: %.2f' % preds.item())
 
         @_trace_decorator
         @_error_decorator()
         def test(self):         
                 theimages = list(glob.glob(os.path.join("data/images",'*.*')))
                 print(theimages)                
-                for x in theimages:
-                        image = Image.open(x)
+                resnetfile = f"{self.root_app}{os.path.sep}data{os.path.sep}models{os.path.sep}{self.jsprms.prms['resnet_file']}"
+                for img in theimages:
+                        image = Image.open(img)
                         model = torchvision.models.resnet50()
+                       # num_ftrs = model.fc.in_features
+                       # model.fc = torch.nn.Linear(num_ftrs, 1000)
                         # model.avgpool = nn.AdaptiveAvgPool2d(1) # for any size of the input
-                        # model.fc = torch.nn.Linear(in_features=2048, out_features=1)
-                        num_ftrs = model.fc.in_features
-                        model.fc = torch.nn.Linear(num_ftrs, 1000)
-                        resnetfile = f"{self.root_app}{os.path.sep}data{os.path.sep}models{os.path.sep}{self.jsprms.prms['resnet_file']}"
-                        model.load_state_dict(torch.load(resnetfile)) 
-                        model.eval()
-                        self.predict(image, model, x)
+                        
+                        model.fc = torch.nn.Linear(in_features=2048, out_features=1)
+                        model.load_state_dict(torch.load(resnetfile, map_location=self.device)) 
+                        model.eval().to(self.device)
+                        self.predict(image, model)
         
         def init_main(self, command, jsonfile):
                 try:

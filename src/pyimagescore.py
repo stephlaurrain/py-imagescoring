@@ -14,6 +14,12 @@ import utils.str_utils as str_utils
 from utils.mydecorators import _error_decorator, _trace_decorator
 import inspect
 
+import torch
+import torchvision.models
+import torchvision.transforms as transforms
+from PIL import Image
+
+
 class Pyimagescore:
       
         def __init__(self):                                

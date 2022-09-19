@@ -30,7 +30,7 @@ mkdir .vscode && touch .vscode/settings.json
 
 ```
 {
-    "python.defaultInterpreterPath": "./src/env/bin/python",    
+    "python.defaultInterpreterPath": "env/bin/python",    
     "python.linting.enabled": true,
     "python.linting.flake8Enabled": true,
     "python.formatting.provider": "black",

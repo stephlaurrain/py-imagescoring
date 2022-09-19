@@ -1,5 +1,6 @@
 certifi==2022.9.14
 charset-normalizer==2.1.1
+glob2==0.7
 idna==3.4
 numpy==1.23.3
 Pillow==9.2.0

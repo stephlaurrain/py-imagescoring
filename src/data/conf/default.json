@@ -2,7 +2,8 @@
   "test":false,  
   "chromedriver":"/usr/bin/chromedriver",
   "keep_log_time":1,
-  "keep_log_unit":"m"
+  "keep_log_unit":"m",
+  "resnet_file":"resnet50-0676ba61.pth"
 }
   
 

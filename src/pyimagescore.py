@@ -18,6 +18,7 @@ import torch
 import torchvision.models
 import torchvision.transforms as transforms
 from PIL import Image
+import glob
 
 
 class Pyimagescore:
@@ -36,18 +37,48 @@ class Pyimagescore:
                 self.trace(inspect.stack()[0])                
                 pass
 
-        def testo(self):         
-                self.trace(inspect.stack()[0])
+        @_trace_decorator
+        @_error_decorator()
+        def prepare_image(self, image):
+                if image.mode != 'RGB':
+                        image = image.convert("RGB")
+                Transform = transforms.Compose([
+                        transforms.Resize([224,224]),      
+                        transforms.ToTensor(),
+                        ])
+                image = Transform(image)   
+                image = image.unsqueeze(0)
+                return image
+
+        @_trace_decorator
+        @_error_decorator()
+        def predict(self, image, model, image_path):
+                image = self.prepare_image(image)
+                with torch.no_grad():
+                        preds = model(image)
+                        np_array = preds.detach().numpy()
+               
+                lst = np_array.tolist()
+                print(lst)
                 
-                try:     
-                        
-                        pass
 
-                except Exception as e:
-                        self.log.errlg(e)  
-                        self.driver.close()
-                        self.driver.quit()        
-
+        @_trace_decorator
+        @_error_decorator()
+        def test(self):         
+                theimages = list(glob.glob(os.path.join("data/images",'*.*')))
+                print(theimages)                
+                for x in theimages:
+                        image = Image.open(x)
+                        model = torchvision.models.resnet50()
+                        # model.avgpool = nn.AdaptiveAvgPool2d(1) # for any size of the input
+                        # model.fc = torch.nn.Linear(in_features=2048, out_features=1)
+                        num_ftrs = model.fc.in_features
+                        model.fc = torch.nn.Linear(num_ftrs, 1000)
+                        resnetfile = f"{self.root_app}{os.path.sep}data{os.path.sep}models{os.path.sep}{self.jsprms.prms['resnet_file']}"
+                        model.load_state_dict(torch.load(resnetfile)) 
+                        model.eval()
+                        self.predict(image, model, x)
+        
         def init_main(self, command, jsonfile):
                 try:
                         self.root_app = os.getcwd()
@@ -56,7 +87,7 @@ class Pyimagescore:
                         self.trace(inspect.stack()[0])
                         jsonFn = f"{self.root_app}{os.path.sep}data{os.path.sep}conf{os.path.sep}{jsonfile}.json"
                         self.jsprms = jsonprms.Prms(jsonFn)                        
-                        self.test = self.jsprms.prms['test']                                               
+                        # self.test = self.jsprms.prms['test']                                               
                         self.log.lg("=HERE WE GO=")
                         keep_log_time = self.jsprms.prms['keep_log_time']
                         keep_log_unit = self.jsprms.prms['keep_log_unit']
@@ -71,8 +102,7 @@ class Pyimagescore:
                         # InitBot
                         # args
                         nbargs = len(sys.argv)
-                        command = "doreport" if (nbargs == 1) else sys.argv[1]
-                        #command = "test" if (nbargs == 1) else sys.argv[1]
+                        command = "test" if (nbargs == 1) else sys.argv[1]                        
                         # json parameters from file
                         jsonfile = "default" if (nbargs < 3) else sys.argv[2].lower()          
                         param = "default" if (nbargs < 4) else sys.argv[3].lower()                
@@ -82,10 +112,10 @@ class Pyimagescore:
                        
                         # for tests command = "test"
                         self.trace(inspect.stack()[0])     
-                        self.driver = self.init()                        
+                        self.driver = self.init_main(command, jsonfile)                        
                         print(command)                                                       
                         if (command=="test"):   
-                                print(inspect.stack()[0])
+                                self.test()
 
                         self.log.lg("=THE END COMPLETE=")
                 except KeyboardInterrupt:
@@ -99,15 +129,3 @@ class Pyimagescore:
                 finally:
                         print("==>> DONE <<==")
        
-        
-
-
-              
-               
-    
-
-        
-                
-
-        
-

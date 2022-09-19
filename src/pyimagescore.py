@@ -39,6 +39,15 @@ class Pyimagescore:
                 self.trace(inspect.stack()[0])                
                 pass
 
+        @_trace_decorator        
+        @_error_decorator()
+        def write_to_result_file(self, text_file, pth, score):                                       
+                text_file.write("#####################\n")                                                                
+                text_file.write(f"{pth}\n")
+                text_file.write(f"image ={pth}\n")
+                text_file.write(f"score ={score}\n")
+                
+
         @_trace_decorator
         @_error_decorator()
         def prepare_image(self, image):
@@ -58,7 +67,9 @@ class Pyimagescore:
                 image = self.prepare_image(image)
                 with torch.no_grad():
                         preds = model(image)
-                print(r'Popularity score: %.2f' % preds.item())
+                
+                return r'%.2f' % preds.item()
+                
 
         @_trace_decorator
         @_error_decorator()
@@ -66,6 +77,8 @@ class Pyimagescore:
                 theimages = list(glob.glob(os.path.join("data/images",'*.*')))
                 print(theimages)                
                 resnetfile = f"{self.root_app}{os.path.sep}data{os.path.sep}models{os.path.sep}{self.jsprms.prms['resnet_file']}"
+                result_file_path =  f"{self.root_app}{os.path.sep}data{os.path.sep}results.txt"
+                text_file = open(result_file_path, "w")     
                 for img in theimages:
                         image = Image.open(img)
                         model = torchvision.models.resnet50()
@@ -76,7 +89,11 @@ class Pyimagescore:
                         model.fc = torch.nn.Linear(in_features=2048, out_features=1)
                         model.load_state_dict(torch.load(resnetfile, map_location=self.device)) 
                         model.eval().to(self.device)
-                        self.predict(image, model)
+                        print(img)
+                        score = self.predict(image, model)
+                        print(f'Popularity score: {score}')
+                        self.write_to_result_file(text_file, img, score)
+                text_file.close() 
         
         def init_main(self, command, jsonfile):
                 try:

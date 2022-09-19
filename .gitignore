@@ -141,3 +141,4 @@ __pycache__/
 .pytest*
 src/data/models/
 src/data/images/
+src/data/results.txt

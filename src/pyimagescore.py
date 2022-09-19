@@ -129,11 +129,11 @@ class Pyimagescore:
                         jsonfile = "default" if (nbargs < 3) else sys.argv[2].lower()          
                         param = "default" if (nbargs < 4) else sys.argv[3].lower()                
                         print(f"command={command}") 
-                        self.init_main(command, jsonfile) 
+                        
                         #logs
                         # for tests command = "test"
                         self.trace(inspect.stack()[0])     
-                        self.driver = self.init_main(jsonfile)                        
+                        self.init_main(jsonfile) 
                         print(command)                                                       
                         if (command=="test"):   
                                 self.test()

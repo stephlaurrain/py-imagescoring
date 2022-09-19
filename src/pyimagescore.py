@@ -129,12 +129,10 @@ class Pyimagescore:
                         jsonfile = "default" if (nbargs < 3) else sys.argv[2].lower()          
                         param = "default" if (nbargs < 4) else sys.argv[3].lower()                
                         print(f"command={command}") 
-                        
                         #logs
                         # for tests command = "test"
                         self.init_main(jsonfile) 
-                        self.trace(inspect.stack()[0])     
-                       
+                        self.trace(inspect.stack()[0])                            
                         print(command)                                                       
                         if (command=="test"):   
                                 self.test()
